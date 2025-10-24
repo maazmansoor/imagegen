@@ -26,10 +26,11 @@ col1, col2, col3 = st.columns(3)
 with col1:
     gender = st.selectbox("Gender", ["Any", "Male", "Female"], index=2)
 with col2:
-    age = st.selectbox("Age Group", ["Any", "Child", "Teen", "Young Woman", "Adult Woman", "Middle Aged", "Elderly"], index=3)
+    age = st.selectbox("Age Group", ["Any", "18-24 months", "20-30 years", "30-40 years", "40-50 years", "50-60 years"], index=3)
 with col3:
-    pose = st.selectbox("Pose", ["Front view", "3/4 view", "Side profile", "Looking down", "Looking up"], index=0)
+    ethnicity = st.selectbox("Ethnicity", ["Any", "Caucasian/White", "Hispanic/Latino", "African-American/African", "South Asian", "East Asian", "Middle-Eastern"], index=1)
 
+pose = st.selectbox("Pose", ["Front view", "3/4 view", "Side profile", "Looking down", "Looking up"], index=0)
 expression = st.selectbox("Facial Expression", ["Neutral", "Slight Smile", "Full Smile", "Serious", "Calm"], index=1)
 
 # --- Settings ---
@@ -59,37 +60,47 @@ prompt_user = st.text_area(
 # 🪄 PROMPT BUILDER
 # ----------------------------
 def build_prompt():
-    base = "A detailed pencil sketch portrait of"
-    subject_parts = []
+    # --- POSITIVE PROMPT ---
+    positive = "hand-drawn graphite pencil sketch portrait of a good looking"
 
-    if age != "Any":
-        subject_parts.append(age.lower())
-    if gender != "Any":
-        subject_parts.append(gender.lower())
+    # Demographics
     if expression != "Neutral":
-        subject_parts.append(f"{expression.lower()} expression")
+        positive += f" {expression.lower()}"
+    if ethnicity != "Any":
+        positive += f" {ethnicity.lower()}"
+    if gender != "Any":
+        positive += f" {gender.lower()}"
+    if age != "Any":
+        positive += f", {age.lower()}"
 
-    subject_description = " ".join(subject_parts) if subject_parts else "a person"
+    # Pose and Framing
+    positive += " looks at her age, close-up head and upper shoulders,"
+    if pose == "Front view":
+        positive += " front view, looking directly at viewer, clear eye contact,"
+    else:
+        positive += f" {pose.lower()},"
+    positive += " gentle closed-mouth smile; medium size hair, clothes: lightweight crewneck sweater;"
 
-    # core artistic prompt
-    prompt = (
-        f"{base} {subject_description}, "
-        f"{pose.lower()}, drawn on textured sketch paper using graphite pencils. "
-        f"Fine pencil strokes, detailed shading, natural proportions, cross-hatching technique, "
-        f"light and shadow contrast, hand-drawn feel, artistic imperfections preserved."
-    )
+    # Artistic Style
+    positive += " visible pencil strokes, sketchy lines, hand-drawn marks, subtle cross-hatching, paper texture, matte shading, black and white, finished complete portrait, clean framing, full head visible, soft diffuse lighting, traditional pencil rendering, unsigned artwork, no signature, clean sketch"
 
-    # user extra notes
+    # User extra notes
     if prompt_user.strip():
-        prompt += f" {prompt_user.strip()}"
+        positive += f", {prompt_user.strip()}"
 
-    # strong negative prompt
+    # --- NEGATIVE PROMPT ---
     negative = (
-        "no color, no watercolor, no digital paint, no 3d render, no realism, no ink, no marker, "
-        "no background clutter, no text, no watermark, no logo, no signature, no cartoon style, no anime."
+        "signature, artist signature, initials, text, letters, watermark, logo, stamp, copyright, monogram, "
+        "vector clean outlines, inked lineart, comic inking, cell shading, digital paint, CGI, 3D render, "
+        "fully rendered/polished finish, complete hair, global smooth gradients, blending stump/smudge/charcoal wash, "
+        "sepia/warm tone/color tint, beauty/cinematic/high-key lighting, glossy skin, specular highlights, rim light, HDR, "
+        "pores, microdetail, veins, measurement marks, crosshair, eye-line, multiple guidelines, random strokes, "
+        "scribbles, swatches, test marks, margin marks, dust, frame, border, vignette, big/oversized/doll eyes, "
+        "strong catchlights, eyeliner, mascara, long eyelashes, teeth, jewelry, hats, bows, slogans, "
+        "cropped head, partial head, head out of frame."
     )
 
-    return f"{prompt} --negative: {negative}"
+    return f"{positive} --negative: {negative}"
 
 # ----------------------------
 # 🚀 IMAGE GENERATION
