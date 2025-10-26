@@ -30,8 +30,30 @@ with col2:
 with col3:
     ethnicity = st.selectbox("Ethnicity", ["Any", "Caucasian/White", "Hispanic/Latino", "African-American/African", "South Asian", "East Asian", "Middle-Eastern"], index=1)
 
+col1, col2, col3 = st.columns(3)
+with col1:
+    eye_shape = st.selectbox("Eye Shape", ["Any", "Almond", "Round", "Monolid", "Hooded", "Upturned", "Downturned"])
+with col2:
+    lips_shape = st.selectbox("Lips Shape", ["Any", "Full", "Thin", "Heart-shaped", "Round"])
+with col3:
+    nose = st.selectbox("Nose Shape", ["Any", "Straight", "Button", "Hooked"])
+
+col1, col2 = st.columns(2)
+with col1:
+    face_cutt = st.selectbox("Face Cut", ["Any", "Oval", "Round", "Square", "Heart"])
+with col2:
+    cheecks = st.selectbox("Cheeks", ["Any", "High cheekbones", "Chubby cheeks", "Defined"])
+
+
 pose = st.selectbox("Pose", ["Front view", "3/4 view", "Side profile", "Looking down", "Looking up"], index=0)
 expression = st.selectbox("Facial Expression", ["Neutral", "Slight Smile", "Full Smile", "Serious", "Calm"], index=1)
+
+st.header("💇‍♀️ Hair Style")
+hair_style = st.selectbox("Hair Style", ["Any", "Straight", "Wavy", "Curly", "Coily", "Bob cut", "Pixie cut"])
+
+st.header("✨ Other Features")
+eyebrow_shape = st.selectbox("Eyebrow Shape", ["Any", "Thick", "Thin", "Arched", "Straight"])
+
 
 # --- Settings ---
 st.header("⚙ Generation Settings")
@@ -73,13 +95,34 @@ def build_prompt():
     if age != "Any":
         positive += f", {age.lower()}"
 
+    # Facial Features
+    if eye_shape != "Any":
+        positive += f", {eye_shape.lower()} eyes"
+    if lips_shape != "Any":
+        positive += f", {lips_shape.lower()} lips"
+    if nose != "Any":
+        positive += f", a {nose.lower()} nose"
+    if face_cutt != "Any":
+        positive += f", {face_cutt.lower()} face shape"
+    if cheecks != "Any":
+        positive += f", with {cheecks.lower()}"
+
+    # Eyebrows and Skin
+    if eyebrow_shape != "Any":
+        positive += f", {eyebrow_shape.lower()} eyebrows"
+
     # Pose and Framing
     positive += " looks at her age, close-up head and upper shoulders,"
     if pose == "Front view":
         positive += " front view, looking directly at viewer, clear eye contact,"
     else:
         positive += f" {pose.lower()},"
-    positive += " gentle closed-mouth smile; medium size hair, clothes: lightweight crewneck sweater;"
+
+    hair_description = "medium size hair"
+    if hair_style != "Any":
+        hair_description = f"{hair_style.lower()} hair"
+
+    positive += f" gentle closed-mouth smile; {hair_description}, clothes: lightweight crewneck sweater;"
 
     # Artistic Style
     positive += " visible pencil strokes, sketchy lines, hand-drawn marks, subtle cross-hatching, paper texture, matte shading, black and white, finished complete portrait, clean framing, full head visible, soft diffuse lighting, traditional pencil rendering, unsigned artwork, no signature, clean sketch"
